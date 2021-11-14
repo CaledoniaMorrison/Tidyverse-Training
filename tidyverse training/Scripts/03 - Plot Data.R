@@ -1,5 +1,8 @@
 # 03 - Plotting Data in R with ggplot
 
+# Extra Resources: https://www.rstudio.com/resources/cheatsheets/
+#   Recommended: "Data visualization with ggplot2 cheatsheet"
+
 # housekeeping ----
 
 # libraries
