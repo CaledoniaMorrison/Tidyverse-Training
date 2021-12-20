@@ -4,6 +4,7 @@
 #   Data filtering
 #   Aggregation
 #   Reshaping data using pivot
+#   Joining Datasets
 
 # Extra Resources: https://www.rstudio.com/resources/cheatsheets/
 #   Recommended: "Data transformation with dplyr cheatsheet"
