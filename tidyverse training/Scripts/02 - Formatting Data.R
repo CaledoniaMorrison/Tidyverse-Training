@@ -137,6 +137,7 @@ monthly_tests
 
 # pivoting the data into wide format
 hb_2020
+
 hb_2020_wide <- hb_2020 %>% 
   select(hb_name, percent_positive) %>%
   pivot_wider(names_from = hb_name, values_from = percent_positive)
@@ -152,6 +153,28 @@ hb_2020_wide %>%
   # change the variable names
   rename(Health_Board = name, Percent_Positive = value)
 
+# Merging Data ----
+
+# create two datasets with one (or more) shared variable to merge together by
+health_board_lookup <- covid_trends %>%
+  select(HB, HBName) %>% distinct()
+
+daily_positives <- covid_trends %>% 
+  select(Date, HB, DailyPositive)
+
+# view
+health_board_lookup
+daily_positives
+
+# join function 
+left_join(daily_positives,health_board_lookup, by = "HB")
+
+# can also join using the pipe operator
+daily_positives %>%
+  left_join(health_board_lookup, by = "HB")
+
+# see the data-transformation cheat sheet for more joining functions and
+# when to use them
 
 # save data ----
 saveRDS(hb_2020, "Data/2020 COVID19 Tests by Health Board.rds")
