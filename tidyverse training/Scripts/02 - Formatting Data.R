@@ -13,8 +13,9 @@
 
 # libraries
 library(tidyverse)
-library(lubridate)
+library(lubridate) 
 library(janitor)
+
 
 # data
 covid_trends <- readRDS("Data/COVID19 Trends.rds")
@@ -30,7 +31,14 @@ number_vector <- c(1,2,3,4)  # assign an object to number_vector
 
 # calculate the sum of all the numbers in the object
 sum(number_vector)
-number_vector %>% sum()
+
+number_vector %>% 
+  sum() %>% 
+  as.character() %>% 
+  paste0(0)
+
+paste0(as.character(sum(number_vector)),0)
+
 
 # calculate the mean
 mean(number_vector)
@@ -45,28 +53,51 @@ View(covid_trends) # View data in new pane
 
 # variable names
 names(covid_trends)
-covid_trends <- covid_trends %>% clean_names()
+covid_trends <- covid_trends %>% clean_names(case = "snake")
 names(covid_trends)
 
 # select variables
 covid_trends %>% 
   select(date, hb_name, positive_tests)
 
+covid_trends %>%
+  select(1,3, 4)
+
+covid_trends %>% pull(hb_name)
+
+
 # Calculating Variables with mutate() ----
 
 # numeric
 covid_trends <- covid_trends %>%
+  
   mutate(percent_positive_tests1 = 100*positive_tests/total_tests) %>%
+  
   mutate(percent_positive_tests2 = if_else(total_tests == 0, 0, 100*positive_tests/total_tests))
+
+
+covid_trends %>%
+  mutate(percent_positive_tests1 = 100*positive_tests/total_tests) %>%
+  filter(hb_name == "NHS Orkney") %>%
+  filter(date == 20200228)
+
+mutate(covid_trends, percent_positive_tests1 = 100*positive_tests/total_tests) 
 
 View(covid_trends)
 
 # character
-covid_trends %>%
-  mutate(health_board =  gsub("NHS ", "", hb_name)) %>%
-  select(health_board, hb_name)
+covid_trends %>% 
+  
+  select(hb_name) %>%
+  
+  mutate(health_board =  gsub(" and ", " & ", hb_name)) %>%
+  select(health_board, hb_name) %>%
+  distinct()
 
-# date
+number_vector <- c(1,1,2,3,4,4,5)
+number_vector %>% unique()
+
+# dates
 covid_trends %>% select(date) # view just the date variable
  
 covid_trends <- covid_trends %>%
@@ -130,7 +161,7 @@ monthly_tests <- covid_trends %>%
   # calculate the percent positive
   mutate(percent_positive = 100*positive_tests/total_tests) %>%
   
-  arrange(year, month)
+  arrange(desc(year), month)
 
 monthly_tests
 
@@ -154,25 +185,34 @@ hb_2020_wide %>%
   # change the variable names
   rename(Health_Board = name, Percent_Positive = value)
 
+
+# pivot whole data into wide format
+hb_2020 %>%
+  pivot_longer(cols = c(2,3,4)) %>%
+  pivot_wider(names_from = hb_name, values_from = value) 
+
+
 # Merging Data ----
 
 # create two datasets with one (or more) shared variable to merge together by
 health_board_lookup <- covid_trends %>%
-  select(HB, HBName) %>% distinct()
+  select(hb, hb_name) %>% distinct()
 
 daily_positives <- covid_trends %>% 
-  select(Date, HB, DailyPositive)
+  select(date, hb, daily_positive)
 
 # view
 health_board_lookup
 daily_positives
 
 # join function 
-left_join(daily_positives,health_board_lookup, by = "HB")
+left_join(daily_positives,health_board_lookup, by = "hb")
 
 # can also join using the pipe operator
 daily_positives %>%
-  left_join(health_board_lookup, by = "HB")
+  left_join(health_board_lookup, by = "hb")
+
+
 
 # see the data-transformation cheat sheet for more joining functions and
 # when to use them
